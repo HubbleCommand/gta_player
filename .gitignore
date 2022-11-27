@@ -43,4 +43,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-/assets/gta/*
+/assets/gta_player_audio/*
+/assets/station_icons/*
