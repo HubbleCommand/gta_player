@@ -158,7 +158,10 @@ class _PlayerState extends State<PlayerWidget> {
                   setState(() {
                     player.stop();
                     selectedStation = selectedStation - 1 <= 0 ? stationsInstanced.length - 1 : selectedStation - 1;
-                    play(stationsInstanced[selectedStation].play());
+
+                    if(_playingNotifier.value){
+                      play(stationsInstanced[selectedStation].play());
+                    }
                   });
                 },
               ),
@@ -209,7 +212,10 @@ class _PlayerState extends State<PlayerWidget> {
                   setState(() {
                     player.stop();
                     selectedStation = selectedStation + 1 >= stationsInstanced.length - 1 ? 0 : selectedStation + 1;
-                    play(stationsInstanced[selectedStation].play());
+
+                    if(_playingNotifier.value){
+                      play(stationsInstanced[selectedStation].play());
+                    }
                   });
                 },
               )
