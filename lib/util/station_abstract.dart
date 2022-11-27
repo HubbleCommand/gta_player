@@ -60,7 +60,7 @@ class StationUnsplit extends StationAbstract {
   late String audioFile;
 
   StationUnsplit({required super.name, required super.source}) {
-    audioFile = "assets/gta_player_audio/$source/SRC.wav";
+    audioFile = "$source/SRC.wav";
   }
 
   @override
