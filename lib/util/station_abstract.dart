@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:gta_player/util/globals.dart';
 import 'package:gta_player/util/preferences.dart';
 
 
@@ -19,8 +17,16 @@ abstract class StationAbstract {
   String name;
   String source;
   late String icon;
+
+  /*static StationAbstract getConcreteImplementation(String name String path) {
+    if(Directory("$path/SRC.wav").existsSync()) {
+
+    }
+    if(Directory("$path/SONGS").existsSync())
+  }*/
+
   StationAbstract({required this.name, required this.source}){
-    icon = "assets/gta_player_audio/$source/icon.png"; //"${GLOBALS.ICONS_PATH}${station.icon}"
+    icon = "$source/icon.png";
     if(!File(icon).existsSync()){
       icon = "assets/missing_icon.png";
     }
@@ -84,16 +90,16 @@ abstract class StationSplitAbstract extends StationAbstract {
   int currentlyPlayingIndex = 0;
 
   String getStationID() {
-    int selectedID = getRandom(countFiles(directory : "${GLOBALS.AUDIO_PATH}$source/ID/"));
-    return "${GLOBALS.AUDIO_PATH}$source/ID/ID_$selectedID.wav";
+    int selectedID = getRandom(countFiles(directory : "$source/ID/"));
+    return "$source/ID/ID_$selectedID.wav";
   }
 
   String getNews() {
-    return "${GLOBALS.NEWS_PATH}${getRandom(177)}.wav";
+    return "${Preferences.instance.NewsPath}/${getRandom(177)}.wav";
   }
 
   String getAdvert(){
-    return "${GLOBALS.ADS_PATH}${getRandom(165)}.wav";
+    return "${Preferences.instance.AdsPath}/${getRandom(165)}.wav";
   }
 
   String getWeather(){
@@ -117,7 +123,7 @@ abstract class StationSplitAbstract extends StationAbstract {
   }
 
   StationSplitAbstract({required super.name, required super.source}){
-    supportsWeather = Directory("${GLOBALS.AUDIO_PATH}$source/WEATH").existsSync();
+    supportsWeather = Directory("$source/TO/WEATH").existsSync();
   }
 }
 
@@ -133,12 +139,12 @@ class StationTalkshow extends StationSplitAbstract {
 
     if(currentlyPlayingIndex < 0){
       //-1 for .csv
-      currentlyPlayingIndex = countFiles(directory : "${GLOBALS.AUDIO_PATH}$source/MONO/") - 1 - 1;
+      currentlyPlayingIndex = countFiles(directory : "$source/MONO/") - 1 - 1;
     }
 
     return Audio(
-      name: getAssetMetadata("${GLOBALS.AUDIO_PATH}$source/MONO/", currentlyPlayingIndex),
-      source: "${GLOBALS.AUDIO_PATH}$source/MONO/$currentlyPlayingIndex.wav"
+      name: getAssetMetadata("$source/MONO/", currentlyPlayingIndex),
+      source: "$source/MONO/$currentlyPlayingIndex.wav"
     );
   }
 
@@ -159,10 +165,10 @@ class StationTalkshow extends StationSplitAbstract {
     } else {
       countDown = getRandom(10, min: 3);
 
-      currentlyPlayingIndex = getRandom(countFiles(directory : "${GLOBALS.AUDIO_PATH}$source/MONO/") - 1);
+      currentlyPlayingIndex = getRandom(countFiles(directory : "$source/MONO/") - 1);
       return Audio(
-        name: getAssetMetadata("${GLOBALS.AUDIO_PATH}$source/MONO/", currentlyPlayingIndex),
-        source: "${GLOBALS.AUDIO_PATH}$source/MONO/$currentlyPlayingIndex.wav"
+        name: getAssetMetadata("$source/MONO/", currentlyPlayingIndex),
+        source: "$source/MONO/$currentlyPlayingIndex.wav"
       );
     }
   }
@@ -173,13 +179,13 @@ class StationTalkshow extends StationSplitAbstract {
     currentlyPlayingIndex++;
 
     //-1 for .csv
-    if(currentlyPlayingIndex >= countFiles(directory : "${GLOBALS.AUDIO_PATH}$source/MONO/") - 1 - 1){
+    if(currentlyPlayingIndex >= countFiles(directory : "$source/MONO/") - 1 - 1){
       currentlyPlayingIndex = 0;
     }
 
     return Audio(
-      name: getAssetMetadata("${GLOBALS.AUDIO_PATH}$source/MONO/", currentlyPlayingIndex),
-      source: "${GLOBALS.AUDIO_PATH}$source/MONO/$currentlyPlayingIndex.wav"
+      name: getAssetMetadata("$source/MONO/", currentlyPlayingIndex),
+      source: "$source/MONO/$currentlyPlayingIndex.wav"
     );
   }
 }
@@ -191,27 +197,26 @@ class StationSplit extends StationSplitAbstract {
 
   //TODO handle if no TO anything
   String? getToNews() {
-    int count = countFiles(directory : "${GLOBALS.AUDIO_PATH}$source/TO/NEWS/");
+    int count = countFiles(directory : "$source/TO/NEWS/");
     if(count <= 0) {
       return null;
     }
-    int selectedTo = getRandom(count);
-    return "${GLOBALS.AUDIO_PATH}$source/TO/NEWS/TNEW_$selectedTo.wav";
+    int selectedTo = getRandom(count) + 1;
+    return "$source/TO/NEWS/TNEW_$selectedTo.wav";
   }
 
   String? getToAdvert() {
-    //int selectedTo = getRandom(countFiles(directory : "${GLOBALS.AUDIO_PATH}$source/TO/AD/"));
-    int count = countFiles(directory : "${GLOBALS.AUDIO_PATH}$source/TO/NEWS/");
+    int count = countFiles(directory : "$source/TO/NEWS/");
     if(count <= 0) {
       return null;
     }
-    int selectedTo = getRandom(count);
-    return "${GLOBALS.AUDIO_PATH}$source/TO/AD/TAD_$selectedTo.wav";
+    int selectedTo = getRandom(count) + 1;
+    return "$source/TO/AD/TAD_$selectedTo.wav";
   }
 
   String getHostSnippet() {
-    int selectedSnippet = getRandom(countFiles(directory : "${GLOBALS.AUDIO_PATH}$source/HOST/"));
-    return "${GLOBALS.AUDIO_PATH}$source/HOST/$selectedSnippet.wav";
+    int selectedSnippet = getRandom(countFiles(directory : "$source/HOST/"));
+    return "$source/HOST/$selectedSnippet.wav";
   }
 
   //String get
@@ -219,9 +224,9 @@ class StationSplit extends StationSplitAbstract {
   int countSongIntro(int songNumber) {
     int availableIntros = 0;
     bool hasMoreIntros = false;
-    
+
     while(hasMoreIntros) {
-      hasMoreIntros = File("${GLOBALS.AUDIO_PATH}$source/INTRO/${songNumber}_$availableIntros.wav").existsSync();
+      hasMoreIntros = File("$source/INTRO/${songNumber}_$availableIntros.wav").existsSync();
       availableIntros++;
     }
     return availableIntros;
@@ -233,11 +238,11 @@ class StationSplit extends StationSplitAbstract {
     currentlyPlayingIndex++;
 
     //-1 for .csv
-    if(currentlyPlayingIndex >= countFiles(directory : "${GLOBALS.AUDIO_PATH}$source/SONGS/") - 1 - 1){
+    if(currentlyPlayingIndex >= countFiles(directory : "$source/SONGS/") - 1 - 1){
       currentlyPlayingIndex = 0;
     }
 
-    return Audio(name: getAssetMetadata("${GLOBALS.AUDIO_PATH}$source/SONGS", currentlyPlayingIndex), source: "${GLOBALS.AUDIO_PATH}$source/SONGS/$currentlyPlayingIndex.wav");
+    return Audio(name: getAssetMetadata("$source/SONGS", currentlyPlayingIndex), source: "$source/SONGS/$currentlyPlayingIndex.wav");
   }
 
   @override
@@ -245,7 +250,7 @@ class StationSplit extends StationSplitAbstract {
     if(introducingSong) {
       introducingSong = false;
       countDown--;
-      return Audio(name: getAssetMetadata("${GLOBALS.AUDIO_PATH}$source/SONGS", currentlyPlayingIndex), source: "${GLOBALS.AUDIO_PATH}$source/SONGS/$currentlyPlayingIndex.wav");
+      return Audio(name: getAssetMetadata("$source/SONGS", currentlyPlayingIndex), source: "$source/SONGS/$currentlyPlayingIndex.wav");
     } else if (intermission != null) {
       if(countDown < 0) {
         intermission = null;
@@ -280,16 +285,16 @@ class StationSplit extends StationSplitAbstract {
         }
       } else {
         //-1 for .csv
-        currentlyPlayingIndex = getRandom(countFiles(directory : "${GLOBALS.AUDIO_PATH}$source/SONGS/") - 1);
+        currentlyPlayingIndex = getRandom(countFiles(directory : "$source/SONGS/") - 1);
         introducingSong = true;
 
         int availableSongIntros = countSongIntro(currentlyPlayingIndex);
         if(Random().nextBool() && availableSongIntros > 0) {
           return Audio(
-              name: getAssetMetadata("${GLOBALS.AUDIO_PATH}$source/SONGS", currentlyPlayingIndex),
-              source: "${GLOBALS.AUDIO_PATH}$source/INTRO/${currentlyPlayingIndex}_${getRandom(availableSongIntros) + 1}.wav");
+              name: getAssetMetadata("$source/SONGS", currentlyPlayingIndex),
+              source: "$source/INTRO/${currentlyPlayingIndex}_${getRandom(availableSongIntros) + 1}.wav");
         } else {
-          return Audio(name: getAssetMetadata("${GLOBALS.AUDIO_PATH}$source/SONGS", currentlyPlayingIndex), source: getHostSnippet());
+          return Audio(name: getAssetMetadata("$source/SONGS", currentlyPlayingIndex), source: getHostSnippet());
         }
       }
     }
@@ -302,9 +307,9 @@ class StationSplit extends StationSplitAbstract {
 
     if(currentlyPlayingIndex < 0){
       //-1 for .csv
-      currentlyPlayingIndex = countFiles(directory : "${GLOBALS.AUDIO_PATH}$source/SONGS/") - 1 - 1;
+      currentlyPlayingIndex = countFiles(directory : "$source/SONGS/") - 1 - 1;
     }
 
-    return Audio(name: getAssetMetadata("${GLOBALS.AUDIO_PATH}$source/SONGS", currentlyPlayingIndex), source: "${GLOBALS.AUDIO_PATH}$source/SONGS/$currentlyPlayingIndex.wav");
+    return Audio(name: getAssetMetadata("$source/SONGS", currentlyPlayingIndex), source: "$source/SONGS/$currentlyPlayingIndex.wav");
   }
 }
