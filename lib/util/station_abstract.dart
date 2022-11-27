@@ -107,8 +107,8 @@ abstract class StationSplitAbstract extends StationAbstract {
       return getNews();
     }
     Weather selectedWeatherType = Weather.values[getRandom(Weather.values.length)];
-    int selectedWeather = getRandom(countFiles(directory : "/assets/gta_player_audio/WEATHER/${selectedWeatherType.name}/"));
-    return "/assets/gta_player_audio/WEATHER/$selectedWeatherType/$selectedWeather.wav";
+    int selectedWeather = getRandom(countFiles(directory : "${Preferences.instance.WeatherPath}/${selectedWeatherType.name}/"));
+    return "${Preferences.instance.WeatherPath}/$selectedWeatherType/$selectedWeather.wav";
   }
 
   String getAssetMetadata(String folder, int number){
