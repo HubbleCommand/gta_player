@@ -93,9 +93,7 @@ abstract class StationSplitAbstract extends StationAbstract {
   }
 
   String getAdvert(){
-    //Preferences().NewsPath;
-    //return "${GLOBALS.ADS_PATH}${getRandom(165)}.wav";
-    return "${Preferences().AdsPath}${getRandom(165)}.wav";
+    return "${GLOBALS.ADS_PATH}${getRandom(165)}.wav";
   }
 
   String getWeather(){
