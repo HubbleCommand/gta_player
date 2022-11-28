@@ -22,6 +22,7 @@ class _PlayerState extends State<PlayerWidget> {
     super.initState();
 
     stationsInstanced = Preferences.instance.getStations();
+    selectedStation = Preferences.instance.Station ?? selectedStation;
 
     player.onPlayerComplete.listen((event) {
       //Play next
@@ -40,6 +41,8 @@ class _PlayerState extends State<PlayerWidget> {
         _duration = event;
       });
     });
+
+    play(stationsInstanced[selectedStation].play());
   }
 
   final ValueNotifier<bool> _playingNotifier = ValueNotifier(false);
@@ -70,8 +73,11 @@ class _PlayerState extends State<PlayerWidget> {
       _nameNotifier.value = asset.name;
       player.play(DeviceFileSource(asset.source));
 
-      if(asset.startFrom != null) {
-        _seek(asset.startFrom!, false);
+      if(asset.seekAmount != null) {
+        _seek(asset.seekAmount! + _positionNotifier.value, true);
+      }
+      if(asset.startAt != null) {
+        _seek(asset.startAt!, false);
       }
     } catch (e) {
       _nameNotifier.value = "ERROR LOADING FILE";
@@ -158,10 +164,8 @@ class _PlayerState extends State<PlayerWidget> {
                   setState(() {
                     player.stop();
                     selectedStation = selectedStation - 1 <= 0 ? stationsInstanced.length - 1 : selectedStation - 1;
-
-                    if(_playingNotifier.value){
-                      play(stationsInstanced[selectedStation].play());
-                    }
+                    Preferences.instance.setCurrentStation(selectedStation);
+                    play(stationsInstanced[selectedStation].play());
                   });
                 },
               ),
@@ -212,10 +216,8 @@ class _PlayerState extends State<PlayerWidget> {
                   setState(() {
                     player.stop();
                     selectedStation = selectedStation + 1 >= stationsInstanced.length - 1 ? 0 : selectedStation + 1;
-
-                    if(_playingNotifier.value){
-                      play(stationsInstanced[selectedStation].play());
-                    }
+                    Preferences.instance.setCurrentStation(selectedStation);
+                    play(stationsInstanced[selectedStation].play());
                   });
                 },
               )
