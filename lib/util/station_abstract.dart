@@ -54,20 +54,21 @@ abstract class StationAbstract {
 
 class StationUnsplit extends StationAbstract {
   late String audioFile;
+  late Duration duration;
 
   StationUnsplit({required super.name, required super.source}) {
     audioFile = "$source/SRC.wav";
+    duration = Duration(seconds: FileUtils.getFileDuration(audioFile).round());
   }
 
   @override
   Audio next() {
-    //TODO something with skipping...
     return Audio(name : "", source: audioFile, seekAmount: const Duration(seconds: 30));
   }
 
   @override
   Audio play() {
-    return Audio(name : "", source: audioFile, startAt: Duration(seconds: Random().nextInt(FileUtils.getFileDuration(audioFile).round())));
+    return Audio(name : "", source: audioFile, startAt: Duration(seconds: Random().nextInt(duration.inSeconds)));
   }
 
   @override
