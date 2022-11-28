@@ -1,29 +1,25 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:gta_player/util/file.dart';
 import 'package:gta_player/util/preferences.dart';
 
 
 class Audio {
   String source;
   String name;
-  Duration? startFrom;
+  Duration? seekAmount;
+  Duration? startAt;
 
-  Audio({required this.name, required this.source, this.startFrom});
+  Audio({required this.name, required this.source, this.seekAmount, this.startAt});
 }
 
 abstract class StationAbstract {
   String name;
   String source;
   late String icon;
-
-  /*static StationAbstract getConcreteImplementation(String name String path) {
-    if(Directory("$path/SRC.wav").existsSync()) {
-
-    }
-    if(Directory("$path/SONGS").existsSync())
-  }*/
 
   StationAbstract({required this.name, required this.source}){
     icon = "$source/icon.png";
@@ -66,17 +62,17 @@ class StationUnsplit extends StationAbstract {
   @override
   Audio next() {
     //TODO something with skipping...
-    return Audio(name : "", source: audioFile);
+    return Audio(name : "", source: audioFile, seekAmount: const Duration(seconds: 30));
   }
 
   @override
   Audio play() {
-    return Audio(name : "", source: audioFile);
+    return Audio(name : "", source: audioFile, startAt: Duration(seconds: Random().nextInt(FileUtils.getFileDuration(audioFile).round())));
   }
 
   @override
   Audio prev() {
-    return Audio(name : "", source: audioFile);
+    return Audio(name : "", source: audioFile, seekAmount: const Duration(seconds: -30));
   }
 }
 
