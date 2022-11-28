@@ -246,7 +246,7 @@ class StationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Image.file(File(station.icon), height: 150, width: 150, /*fit: BoxFit.fitWidth,*/),
-      Text("${station.name}"),
+      Text(station.name),
     ]);
   }
 }
