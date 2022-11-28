@@ -16,10 +16,8 @@ class _LoadingState extends State<LoadingWidget> {
   void initState() {
     super.initState();
     Preferences.instance.initialize().then((value) {
-      //TODO first, we initialize preferences, then load stations? Or is just this enough
-      //ACTUALLY check if necessary things have boon configured, otherwise send to settings!
-
       Widget destination = const PlayerWidget();
+
       if(Preferences.instance.Stations == null || Preferences.instance.AdsPath == null || Preferences.instance.NewsPath == null) {
         destination = const SettingsWidget();
       }
