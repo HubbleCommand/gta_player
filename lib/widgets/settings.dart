@@ -2,7 +2,6 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gta_player/util/preferences.dart';
 import 'package:gta_player/widgets/player.dart';
@@ -36,6 +35,19 @@ class _SettingsState extends State<SettingsWidget> {
     }
 
     return await FilePicker.platform.getDirectoryPath();
+  }
+
+  List<Widget> getStationsPath() {
+    List<Widget> res = [];
+    if(stationsPath != null) {
+      res.add(const Text("Stations Paths :"));
+      for(var stationPath in stationsPath!) {
+        res.add(Text("$stationPath"));
+      }
+    } else {
+      res.add(Text("Stations Path : $stationsPath"));
+    }
+    return res;
   }
 
   @override
@@ -154,7 +166,7 @@ class _SettingsState extends State<SettingsWidget> {
                   });
                 });
               }, child: const Text("Stations Folder")),
-              Text("Stations Path : $stationsPath"),
+              ... getStationsPath()
             ],
           ),
         ),
