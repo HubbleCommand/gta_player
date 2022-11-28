@@ -6,14 +6,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:gta_player/util/file.dart';
 import 'package:gta_player/util/preferences.dart';
 
+class AudioMetadata {
+  String title;
+  String author;
+
+  AudioMetadata({required this.title, required this.author});
+}
 
 class Audio {
   String source;
-  String name;
+  String title;
+  String author;
   Duration? seekAmount;
   Duration? startAt;
 
-  Audio({required this.name, required this.source, this.seekAmount, this.startAt});
+  Audio({required this.title, required this.author, required this.source, this.seekAmount, this.startAt});
 }
 
 abstract class StationAbstract {
@@ -63,17 +70,17 @@ class StationUnsplit extends StationAbstract {
 
   @override
   Audio next() {
-    return Audio(name : "", source: audioFile, seekAmount: const Duration(seconds: 30));
+    return Audio(title : "", author : "", source: audioFile, seekAmount: const Duration(seconds: 30));
   }
 
   @override
   Audio play() {
-    return Audio(name : "", source: audioFile, startAt: Duration(seconds: Random().nextInt(duration.inSeconds)));
+    return Audio(title : "", author : "", source: audioFile, startAt: Duration(seconds: Random().nextInt(duration.inSeconds)));
   }
 
   @override
   Audio prev() {
-    return Audio(name : "", source: audioFile, seekAmount: const Duration(seconds: -30));
+    return Audio(title : "", author : "", source: audioFile, seekAmount: const Duration(seconds: -30));
   }
 }
 
@@ -108,15 +115,17 @@ abstract class StationSplitAbstract extends StationAbstract {
     return "${Preferences.instance.WeatherPath}/$selectedWeatherType/$selectedWeather.wav";
   }
 
-  String getAssetMetadata(String folder, int number){
+  AudioMetadata getAssetMetadata(String folder, int number){
     //TODO probably just move this to constructor instead of doing this on each read
     final metadataFile = File("$folder/mp3tag.csv");
 
     if(!metadataFile.existsSync()) {
-      return "";
+      return AudioMetadata(title: "", author: "");
     }
 
-    return metadataFile.readAsLinesSync()[number + 1].split(";")[0];
+    List<String> lineSplit = metadataFile.readAsLinesSync()[number + 1].split(";");
+
+    return AudioMetadata(title: lineSplit[0], author: lineSplit[1]);
   }
 
   StationSplitAbstract({required super.name, required super.source}){
@@ -139,8 +148,9 @@ class StationTalkshow extends StationSplitAbstract {
       currentlyPlayingIndex = countFiles(directory : "$source/MONO/") - 1 - 1;
     }
 
+    AudioMetadata meta = getAssetMetadata("$source/MONO/", currentlyPlayingIndex);
     return Audio(
-      name: getAssetMetadata("$source/MONO/", currentlyPlayingIndex),
+      title: meta.title, author: meta.author,
       source: "$source/MONO/$currentlyPlayingIndex.wav"
     );
   }
@@ -150,14 +160,14 @@ class StationTalkshow extends StationSplitAbstract {
     if(intermission != null) {
       if(countDown <= 0){
         intermission = null;
-        return Audio(name: name, source: getStationID());
+        return Audio(title: name, author: "", source: getStationID());
       } else {
         countDown--;
 
         if(Random().nextBool()) {
-          return Audio(name: "NEWS", source: getNews());
+          return Audio(title: "NEWS", author: "", source: getNews());
         }
-        return Audio(name: "AD BREAK", source: getAdvert());
+        return Audio(title: "AD BREAK", author: "", source: getAdvert());
       }
     } else {
       //Only play one show between intermissions, immediately configure next intermission
@@ -165,8 +175,9 @@ class StationTalkshow extends StationSplitAbstract {
       countDown = getRandom(10, min: 3);
 
       currentlyPlayingIndex = getRandom(countFiles(directory : "$source/MONO/") - 1);
+      AudioMetadata meta = getAssetMetadata("$source/MONO/", currentlyPlayingIndex);
       return Audio(
-        name: getAssetMetadata("$source/MONO/", currentlyPlayingIndex),
+        title: meta.title, author: meta.author,
         source: "$source/MONO/$currentlyPlayingIndex.wav"
       );
     }
@@ -182,8 +193,9 @@ class StationTalkshow extends StationSplitAbstract {
       currentlyPlayingIndex = 0;
     }
 
+    AudioMetadata meta = getAssetMetadata("$source/MONO/", currentlyPlayingIndex);
     return Audio(
-      name: getAssetMetadata("$source/MONO/", currentlyPlayingIndex),
+      title: meta.title, author: meta.author,
       source: "$source/MONO/$currentlyPlayingIndex.wav"
     );
   }
@@ -241,7 +253,8 @@ class StationSplit extends StationSplitAbstract {
       currentlyPlayingIndex = 0;
     }
 
-    return Audio(name: getAssetMetadata("$source/SONGS", currentlyPlayingIndex), source: "$source/SONGS/$currentlyPlayingIndex.wav");
+    AudioMetadata meta = getAssetMetadata("$source/SONGS", currentlyPlayingIndex);
+    return Audio(title: meta.title, author: meta.author, source: "$source/SONGS/$currentlyPlayingIndex.wav");
   }
 
   @override
@@ -249,21 +262,22 @@ class StationSplit extends StationSplitAbstract {
     if(introducingSong) {
       introducingSong = false;
       countDown--;
-      return Audio(name: getAssetMetadata("$source/SONGS", currentlyPlayingIndex), source: "$source/SONGS/$currentlyPlayingIndex.wav");
+      AudioMetadata meta = getAssetMetadata("$source/SONGS", currentlyPlayingIndex);
+      return Audio(title: meta.title, author: meta.author, source: "$source/SONGS/$currentlyPlayingIndex.wav");
     } else if (intermission != null) {
       if(countDown < 0) {
         intermission = null;
-        return Audio(name: "INTERMISSION OVER", source: getStationID());
+        return Audio(title: "INTERMISSION OVER", author: "", source: getStationID());
       } else {
         countDown--;
 
         switch(intermission!) {
           case Intermission.ADS:
-            return Audio(name: "AD BREAK", source: getAdvert());
+            return Audio(title: "AD BREAK", author: "", source: getAdvert());
           case Intermission.NEWS:
-            return Audio(name: "NEWS", source: getNews());
+            return Audio(title: "NEWS", author: "", source: getNews());
           case Intermission.WEATHER:
-            return Audio(name: "NEWS", source: getWeather());
+            return Audio(title: "NEWS", author: "", source: getWeather());
         }
       }
     } else {
@@ -275,12 +289,12 @@ class StationSplit extends StationSplitAbstract {
           intermission = Intermission.NEWS;
           countDown = getRandom(5, min : 3);
           String? toNews = getToNews();
-          return Audio(name: "NEWS", source: toNews ?? getNews());
+          return Audio(title: "NEWS", author: "", source: toNews ?? getNews());
         } else {
           intermission = Intermission.ADS;
           countDown = getRandom(5, min : 3);
           String? toAds = getToAdvert();
-          return Audio(name: "AD BREAK", source: toAds ?? getAdvert());
+          return Audio(title: "AD BREAK", author: "", source: toAds ?? getAdvert());
         }
       } else {
         //-1 for .csv
@@ -288,12 +302,13 @@ class StationSplit extends StationSplitAbstract {
         introducingSong = true;
 
         int availableSongIntros = countSongIntro(currentlyPlayingIndex);
+        AudioMetadata meta = getAssetMetadata("$source/SONGS", currentlyPlayingIndex);
         if(Random().nextBool() && availableSongIntros > 0) {
           return Audio(
-              name: getAssetMetadata("$source/SONGS", currentlyPlayingIndex),
+              title: meta.title, author: meta.author,
               source: "$source/INTRO/${currentlyPlayingIndex}_${getRandom(availableSongIntros) + 1}.wav");
         } else {
-          return Audio(name: getAssetMetadata("$source/SONGS", currentlyPlayingIndex), source: getHostSnippet());
+          return Audio(title: meta.title, author: meta.author, source: getHostSnippet());
         }
       }
     }
@@ -309,6 +324,7 @@ class StationSplit extends StationSplitAbstract {
       currentlyPlayingIndex = countFiles(directory : "$source/SONGS/") - 1 - 1;
     }
 
-    return Audio(name: getAssetMetadata("$source/SONGS", currentlyPlayingIndex), source: "$source/SONGS/$currentlyPlayingIndex.wav");
+    AudioMetadata meta = getAssetMetadata("$source/SONGS", currentlyPlayingIndex);
+    return Audio(title: meta.title, author: meta.author, source: "$source/SONGS/$currentlyPlayingIndex.wav");
   }
 }

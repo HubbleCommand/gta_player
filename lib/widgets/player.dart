@@ -47,7 +47,8 @@ class _PlayerState extends State<PlayerWidget> {
 
   final ValueNotifier<bool> _playingNotifier = ValueNotifier(false);
   final ValueNotifier<Duration> _positionNotifier = ValueNotifier(const Duration(seconds: 0));
-  final ValueNotifier<String> _nameNotifier = ValueNotifier("");
+  final ValueNotifier<String> _titleNotifier = ValueNotifier("");
+  final ValueNotifier<String> _authorNotifier = ValueNotifier("");
   Duration _duration = const Duration(seconds: 0);
 
   void _seek(Duration duration, bool startFromCurrentPosition) {
@@ -70,7 +71,8 @@ class _PlayerState extends State<PlayerWidget> {
     player.dispose();
 
     try {
-      _nameNotifier.value = asset.name;
+      _titleNotifier.value = asset.title;
+      _authorNotifier.value = asset.author;
       player.play(DeviceFileSource(asset.source));
 
       if(asset.seekAmount != null) {
@@ -80,7 +82,8 @@ class _PlayerState extends State<PlayerWidget> {
         _seek(asset.startAt!, false);
       }
     } catch (e) {
-      _nameNotifier.value = "ERROR LOADING FILE";
+      _titleNotifier.value = "ERROR LOADING FILE";
+      _authorNotifier.value = "";
       player.stop();
       player.dispose();
     }
@@ -112,7 +115,10 @@ class _PlayerState extends State<PlayerWidget> {
             ],
           ),
           Expanded(child: StationCard(station: stationsInstanced[selectedStation])),
-          ValueListenableBuilder(valueListenable: _nameNotifier, builder: (BuildContext context, String value, Widget? child) {
+          ValueListenableBuilder(valueListenable: _titleNotifier, builder: (BuildContext context, String value, Widget? child) {
+            return Text(value);
+          }),
+          ValueListenableBuilder(valueListenable: _authorNotifier, builder: (BuildContext context, String value, Widget? child) {
             return Text(value);
           }),
           Row(
