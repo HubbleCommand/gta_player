@@ -159,6 +159,8 @@ class StationTalkshow extends StationSplitAbstract {
         return Audio(name: "AD BREAK", source: getAdvert());
       }
     } else {
+      //Only play one show between intermissions, immediately configure next intermission
+      intermission = Intermission.values[Random().nextInt(Intermission.values.length)];
       countDown = getRandom(10, min: 3);
 
       currentlyPlayingIndex = getRandom(countFiles(directory : "$source/MONO/") - 1);
