@@ -46,9 +46,24 @@ class _SettingsState extends State<SettingsWidget> {
         appBar: AppBar(
           title: const Text("Configure Files"),
         ),
-        body: Center(
+        body: SingleChildScrollView(
           child: Column(
             children: [
+              if(adsPath != null && newsPath != null && weatherPath != null && stationsPath != null) ... [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50), // NEW
+                  ),
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const PlayerWidget()),
+                      (_) => false
+                    );
+                  },
+                  child: const Text("Go to player")
+                ),
+              ],
               ElevatedButton(onPressed: () {
                 Preferences.instance.resetPreferences();
                 setState(() {
@@ -140,15 +155,6 @@ class _SettingsState extends State<SettingsWidget> {
                 });
               }, child: const Text("Stations Folder")),
               Text("Stations Path : $stationsPath"),
-              if(adsPath != null && newsPath != null && weatherPath != null && stationsPath != null) ... [
-                ElevatedButton(onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const PlayerWidget()),
-                      (_) => false
-                  );
-                }, child: const Text("Go to player")),
-              ]
             ],
           ),
         ),
