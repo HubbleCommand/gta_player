@@ -1,16 +1,12 @@
 # gta_player
 
-A new Flutter project.
+A Flutter app to play GTA radio stations, following a nearly identical formatting to https://github.com/HubbleCommand/GTARadioPi and https://github.com/HubbleCommand/GTARadio.
 
-## Getting Started
+There are some additional file requirements from the other repos:
+- Per station
+    - icon.png (optional)       : the icon that will be shown
+    - name.txt                  : a text file containing only the name of the station to be displayed
+    - /station/songs/mp3tag.csv : (split & talkshow stations) a metadata file generated with MP3Tag to export the song names to a separate file (split & talk show stations)
+    - /station/mono/mp3tag.csv  : (split & talkshow stations) same as above
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Stations and other assets are kept as separate files to avoid excessive build times & application size (15 minutes & 7 gb).
