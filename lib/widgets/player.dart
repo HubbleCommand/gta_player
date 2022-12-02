@@ -244,9 +244,9 @@ class _PlayerState extends State<PlayerWidget> {
 }
 
 class StationCard extends StatelessWidget {
-  StationAbstract station;
+  final StationAbstract station;
 
-  StationCard({super.key, required this.station});
+  const StationCard({super.key, required this.station});
 
   @override
   Widget build(BuildContext context) {
