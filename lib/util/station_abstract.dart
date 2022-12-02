@@ -93,6 +93,8 @@ abstract class StationSplitAbstract extends StationAbstract {
   bool supportsWeather = false;
   int currentlyPlayingIndex = 0;
 
+  late final File metadataFile;
+
   String getStationID() {
     int selectedID = getRandom(countFiles(directory : "$source/ID/"));
     return "$source/ID/ID_$selectedID.wav";
@@ -115,10 +117,7 @@ abstract class StationSplitAbstract extends StationAbstract {
     return "${Preferences.instance.WeatherPath}/$selectedWeatherType/$selectedWeather.wav";
   }
 
-  AudioMetadata getAssetMetadata(String folder, int number){
-    //TODO probably just move this to constructor instead of doing this on each read
-    final metadataFile = File("$folder/mp3tag.csv");
-
+  AudioMetadata getAssetMetadata(int number){
     if(!metadataFile.existsSync()) {
       return AudioMetadata(title: "", author: "");
     }
@@ -136,6 +135,7 @@ abstract class StationSplitAbstract extends StationAbstract {
 class StationTalkshow extends StationSplitAbstract {
   StationTalkshow({required super.name, required super.source}) {
     supportsWeather = true;
+    metadataFile = File("$source/MONO/mp3tag.csv");
   }
 
   @override
@@ -148,7 +148,7 @@ class StationTalkshow extends StationSplitAbstract {
       currentlyPlayingIndex = countFiles(directory : "$source/MONO/") - 1 - 1;
     }
 
-    AudioMetadata meta = getAssetMetadata("$source/MONO/", currentlyPlayingIndex);
+    AudioMetadata meta = getAssetMetadata(currentlyPlayingIndex);
     return Audio(
       title: meta.title, author: meta.author,
       source: "$source/MONO/$currentlyPlayingIndex.wav"
@@ -175,7 +175,7 @@ class StationTalkshow extends StationSplitAbstract {
       countDown = getRandom(10, min: 3);
 
       currentlyPlayingIndex = getRandom(countFiles(directory : "$source/MONO/") - 1);
-      AudioMetadata meta = getAssetMetadata("$source/MONO/", currentlyPlayingIndex);
+      AudioMetadata meta = getAssetMetadata(currentlyPlayingIndex);
       return Audio(
         title: meta.title, author: meta.author,
         source: "$source/MONO/$currentlyPlayingIndex.wav"
@@ -193,7 +193,7 @@ class StationTalkshow extends StationSplitAbstract {
       currentlyPlayingIndex = 0;
     }
 
-    AudioMetadata meta = getAssetMetadata("$source/MONO/", currentlyPlayingIndex);
+    AudioMetadata meta = getAssetMetadata(currentlyPlayingIndex);
     return Audio(
       title: meta.title, author: meta.author,
       source: "$source/MONO/$currentlyPlayingIndex.wav"
@@ -204,7 +204,9 @@ class StationTalkshow extends StationSplitAbstract {
 class StationSplit extends StationSplitAbstract {
   bool introducingSong = false;
 
-  StationSplit({required super.name, required super.source});
+  StationSplit({required super.name, required super.source}) {
+    metadataFile = File("$source/SONGS/mp3tag.csv");
+  }
 
   //TODO handle if no TO anything
   String? getToNews() {
@@ -230,8 +232,6 @@ class StationSplit extends StationSplitAbstract {
     return "$source/HOST/$selectedSnippet.wav";
   }
 
-  //String get
-
   int countSongIntro(int songNumber) {
     int availableIntros = 0;
     bool hasMoreIntros = false;
@@ -253,7 +253,7 @@ class StationSplit extends StationSplitAbstract {
       currentlyPlayingIndex = 0;
     }
 
-    AudioMetadata meta = getAssetMetadata("$source/SONGS", currentlyPlayingIndex);
+    AudioMetadata meta = getAssetMetadata(currentlyPlayingIndex);
     return Audio(title: meta.title, author: meta.author, source: "$source/SONGS/$currentlyPlayingIndex.wav");
   }
 
@@ -262,7 +262,7 @@ class StationSplit extends StationSplitAbstract {
     if(introducingSong) {
       introducingSong = false;
       countDown--;
-      AudioMetadata meta = getAssetMetadata("$source/SONGS", currentlyPlayingIndex);
+      AudioMetadata meta = getAssetMetadata(currentlyPlayingIndex);
       return Audio(title: meta.title, author: meta.author, source: "$source/SONGS/$currentlyPlayingIndex.wav");
     } else if (intermission != null) {
       if(countDown < 0) {
@@ -302,7 +302,7 @@ class StationSplit extends StationSplitAbstract {
         introducingSong = true;
 
         int availableSongIntros = countSongIntro(currentlyPlayingIndex);
-        AudioMetadata meta = getAssetMetadata("$source/SONGS", currentlyPlayingIndex);
+        AudioMetadata meta = getAssetMetadata(currentlyPlayingIndex);
         if(Random().nextBool() && availableSongIntros > 0) {
           return Audio(
               title: meta.title, author: meta.author,
@@ -324,7 +324,7 @@ class StationSplit extends StationSplitAbstract {
       currentlyPlayingIndex = countFiles(directory : "$source/SONGS/") - 1 - 1;
     }
 
-    AudioMetadata meta = getAssetMetadata("$source/SONGS", currentlyPlayingIndex);
+    AudioMetadata meta = getAssetMetadata(currentlyPlayingIndex);
     return Audio(title: meta.title, author: meta.author, source: "$source/SONGS/$currentlyPlayingIndex.wav");
   }
 }
