@@ -251,7 +251,7 @@ class StationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Image.file(File(station.icon), height: 150, width: 150, /*fit: BoxFit.fitWidth,*/),
+      Expanded(child: Image.file(File(station.icon), fit: BoxFit.contain),),
       Text(station.name),
     ]);
   }
