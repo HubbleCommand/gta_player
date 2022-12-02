@@ -116,10 +116,16 @@ class _PlayerState extends State<PlayerWidget> {
           ),
           Expanded(child: StationCard(station: stationsInstanced[selectedStation])),
           ValueListenableBuilder(valueListenable: _titleNotifier, builder: (BuildContext context, String value, Widget? child) {
-            return Text(value);
+            return Visibility(
+              visible: value.isNotEmpty,
+              child: Text(value)
+            );
           }),
           ValueListenableBuilder(valueListenable: _authorNotifier, builder: (BuildContext context, String value, Widget? child) {
-            return Text(value);
+            return Visibility(
+                visible: value.isNotEmpty,
+                child: Text(value)
+            );
           }),
           Row(
             children: [
