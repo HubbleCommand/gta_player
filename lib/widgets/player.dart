@@ -85,9 +85,6 @@ class _PlayerState extends State<PlayerWidget> {
       });
       player.play();
 
-      if(asset.seekAmount != null) {
-        _seek(asset.seekAmount! + _positionNotifier.value, true);
-      }
       if(asset.startAt != null) {
         _seek(asset.startAt!, false);
       }

@@ -16,10 +16,9 @@ class Audio {
   String source;
   String title;
   String author;
-  Duration? seekAmount;
   Duration? startAt;
 
-  Audio({required this.title, required this.author, required this.source, this.seekAmount, this.startAt});
+  Audio({required this.title, required this.author, required this.source, this.startAt});
 }
 
 abstract class StationAbstract {
@@ -69,7 +68,7 @@ class StationUnsplit extends StationAbstract {
 
   @override
   Audio next() {
-    return Audio(title : "", author : "", source: audioFile, seekAmount: const Duration(seconds: 30));
+    return Audio(title : "", author : "", source: audioFile);
   }
 
   @override
@@ -79,7 +78,7 @@ class StationUnsplit extends StationAbstract {
 
   @override
   Audio prev() {
-    return Audio(title : "", author : "", source: audioFile, seekAmount: const Duration(seconds: -30));
+    return Audio(title : "", author : "", source: audioFile);
   }
 }
 
