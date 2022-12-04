@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:gta_player/util/preferences.dart';
@@ -48,7 +49,6 @@ class _PlayerState extends State<PlayerWidget> {
   final ValueNotifier<String> _titleNotifier = ValueNotifier("");
   final ValueNotifier<String> _authorNotifier = ValueNotifier("");
   Duration _duration = const Duration(seconds: 0);
-  bool _isPaused = false;
 
   void _seek(Duration duration, bool startFromCurrentPosition) {
     if(!startFromCurrentPosition) {
@@ -157,19 +157,25 @@ class _PlayerState extends State<PlayerWidget> {
           ValueListenableBuilder(valueListenable: _titleNotifier, builder: (BuildContext context, String value, Widget? child) {
             return Visibility(
               visible: value.isNotEmpty,
-              child: Text(value, style: const TextStyle(fontFamily: 'SevenSegment', color: Colors.white),)
+              child: Text(value, style: const TextStyle(fontFamily: 'FourteenSegment', color: Colors.white, fontFeatures: [
+                FontFeature.tabularFigures()
+              ],),)
             );
           }),
           ValueListenableBuilder(valueListenable: _authorNotifier, builder: (BuildContext context, String value, Widget? child) {
             return Visibility(
               visible: value.isNotEmpty,
-              child: Text(value, style: const TextStyle(fontFamily: 'SevenSegment', color: Colors.white),)
+              child: Text(value, style: const TextStyle(fontFamily: 'FourteenSegment', color: Colors.white, fontFeatures: [
+                FontFeature.tabularFigures()
+              ],),)
             );
           }),
           Row(
             children: [
               ValueListenableBuilder(valueListenable: _positionNotifier, builder: (BuildContext context, Duration value, Widget? child) {
-                return Text(formatTime(value.inSeconds), style: const TextStyle(fontFamily: 'SevenSegment', color: Colors.white));
+                return Text(formatTime(value.inSeconds), style: const TextStyle(fontFamily: 'FourteenSegment', color: Colors.white, fontFeatures: [
+                  FontFeature.tabularFigures()
+                ],));
               }),
               Expanded(
                 child: ValueListenableBuilder(valueListenable: _positionNotifier, builder: (BuildContext context, Duration value, Widget? child) {
@@ -177,18 +183,27 @@ class _PlayerState extends State<PlayerWidget> {
                   if(value.inMilliseconds.toDouble() >= 0 && value.inMilliseconds.toDouble() <= _duration.inMilliseconds.toDouble()) {
                     val = value.inMilliseconds.toDouble();
                   }
-                  return Slider(
-
-                    min: 0,
-                    max: _duration.inMilliseconds.toDouble(),
-                    value: val,
-                    onChanged: (changedValue) {
-                      _seek(Duration(milliseconds: changedValue.toInt()), false);
-                    },
+                  return SliderTheme(
+                    data: SliderThemeData(
+                      thumbShape: RoundSliderOverlayShape(),
+                      thumbColor: Colors.white,
+                    ),
+                    child: Slider(
+                      activeColor: Colors.white,
+                      inactiveColor: Colors.grey,
+                      min: 0,
+                      max: _duration.inMilliseconds.toDouble(),
+                      value: val,
+                      onChanged: (changedValue) {
+                        _seek(Duration(milliseconds: changedValue.toInt()), false);
+                      },
+                    )
                   );
                 }),
               ),
-              Text(formatTime(_duration.inSeconds), style: const TextStyle(fontFamily: 'SevenSegment', color: Colors.white))
+              Text(formatTime(_duration.inSeconds), style: const TextStyle(fontFamily: 'FourteenSegment', color: Colors.white, fontFeatures: [
+                FontFeature.tabularFigures()
+              ],))
             ],
           ),
           Row(
@@ -227,10 +242,8 @@ class _PlayerState extends State<PlayerWidget> {
                     _playingNotifier.value = !_playingNotifier.value;
                     if(_playingNotifier.value) {
                       player.play();
-                      _isPaused = false;
                     } else {
                       player.pause();
-                      _isPaused = true;
                     }
                   },
                 );
