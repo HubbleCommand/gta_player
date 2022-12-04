@@ -101,6 +101,7 @@ class _PlayerState extends State<PlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -109,17 +110,16 @@ class _PlayerState extends State<PlayerWidget> {
             children: [
               Spacer(),
               IconButton(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  hoverColor: Colors.transparent,
-                  icon: const Icon(Icons.settings, size: 18.0),
-                  onPressed: () {
-                    //debugPrint("CLICKED");
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SettingsWidget()),
-                    );
-                  }
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                hoverColor: Colors.transparent,
+                icon: const Icon(Icons.settings, size: 18.0, color: Colors.white,),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SettingsWidget()),
+                  );
+                }
               )
             ],
           ),
@@ -127,19 +127,19 @@ class _PlayerState extends State<PlayerWidget> {
           ValueListenableBuilder(valueListenable: _titleNotifier, builder: (BuildContext context, String value, Widget? child) {
             return Visibility(
               visible: value.isNotEmpty,
-              child: Text(value)
+              child: Text(value, style: const TextStyle(fontFamily: 'SevenSegment', color: Colors.white),)
             );
           }),
           ValueListenableBuilder(valueListenable: _authorNotifier, builder: (BuildContext context, String value, Widget? child) {
             return Visibility(
-                visible: value.isNotEmpty,
-                child: Text(value)
+              visible: value.isNotEmpty,
+              child: Text(value, style: const TextStyle(fontFamily: 'SevenSegment', color: Colors.white),)
             );
           }),
           Row(
             children: [
               ValueListenableBuilder(valueListenable: _positionNotifier, builder: (BuildContext context, Duration value, Widget? child) {
-                return Text(formatTime(value.inSeconds));
+                return Text(formatTime(value.inSeconds), style: const TextStyle(fontFamily: 'SevenSegment', color: Colors.white));
               }),
               Expanded(
                 child: ValueListenableBuilder(valueListenable: _positionNotifier, builder: (BuildContext context, Duration value, Widget? child) {
@@ -153,7 +153,7 @@ class _PlayerState extends State<PlayerWidget> {
                   );
                 }),
               ),
-              Text(formatTime(_duration.inSeconds))
+              Text(formatTime(_duration.inSeconds), style: const TextStyle(fontFamily: 'SevenSegment', color: Colors.white))
             ],
           ),
           Row(
@@ -180,7 +180,7 @@ class _PlayerState extends State<PlayerWidget> {
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 hoverColor: Colors.transparent,
-                icon: const Icon(Icons.skip_previous, size: 18.0),
+                icon: const Icon(Icons.skip_previous, size: 18.0, color: Colors.white,),
                 onPressed: () {
                   playStation(selectedStation - 1 <= 0 ? stationsInstanced.length - 1 : selectedStation - 1);
                 },
@@ -189,7 +189,7 @@ class _PlayerState extends State<PlayerWidget> {
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 hoverColor: Colors.transparent,
-                icon: const Icon(Icons.fast_rewind, size: 18.0),
+                icon: const Icon(Icons.fast_rewind, size: 18.0, color: Colors.white,),
                 onPressed: () {
                   setState(() {
                     play(stationsInstanced[selectedStation].prev());
@@ -201,7 +201,7 @@ class _PlayerState extends State<PlayerWidget> {
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                   hoverColor: Colors.transparent,
-                  icon: Icon(_playingNotifier.value ? Icons.pause : Icons.play_arrow),
+                  icon: Icon(_playingNotifier.value ? Icons.pause : Icons.play_arrow, color: Colors.white,),
                   onPressed: () {
                     _playingNotifier.value = !_playingNotifier.value;
                     if(_playingNotifier.value) {
@@ -216,7 +216,7 @@ class _PlayerState extends State<PlayerWidget> {
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 hoverColor: Colors.transparent,
-                icon: const Icon(Icons.fast_forward, size: 18.0),
+                icon: const Icon(Icons.fast_forward, size: 18.0, color: Colors.white,),
                 onPressed: () {
                   setState(() {
                     play(stationsInstanced[selectedStation].next());
@@ -227,7 +227,7 @@ class _PlayerState extends State<PlayerWidget> {
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 hoverColor: Colors.transparent,
-                icon: const Icon(Icons.skip_next, size: 18.0),
+                icon: const Icon(Icons.skip_next, size: 18.0, color: Colors.white,),
                 onPressed: () {
                   playStation(selectedStation + 1 >= stationsInstanced.length - 1 ? 0 : selectedStation + 1);
                 },
