@@ -25,20 +25,13 @@ class _PlayerState extends State<PlayerWidget> {
     stationsInstanced = Preferences.instance.getStations();
     selectedStation = Preferences.instance.Station ?? selectedStation;
 
-    player.playingStream.listen((event) {
-      //Play next
-      debugPrint("Player completed...");
-      //play(stationsInstanced[selectedStation].play());
-    });
     player.playerStateStream.listen((event) {
       debugPrint(event.toString());
       _playingNotifier.value = event.playing;
 
-      /*if(!event.playing && event.processingState == ProcessingState.completed && !isPaused) {
-        debugPrint("Event was not playing, and was also not paused... so play next!");
-        play(stationsInstanced[selectedStation].play());
-      }*/
       if(event.processingState == ProcessingState.completed) {
+      //if(!event.playing && (event.processingState == ProcessingState.completed || event.processingState == ProcessingState.ready)) {
+      //if(event.processingState == ProcessingState.completed || (!_isPaused && (event.processingState == ProcessingState.completed || event.processingState == ProcessingState.ready))) {
         debugPrint("Event was not playing, and was also not paused... so play next!");
         play(stationsInstanced[selectedStation].play());
       }
@@ -46,11 +39,6 @@ class _PlayerState extends State<PlayerWidget> {
     player.positionStream.listen((event) {
       _positionNotifier.value = event;
     });
-    /*player.onDurationChanged.listen((event) {
-      setState(() {
-        _duration = event;
-      });
-    });*/
 
     play(stationsInstanced[selectedStation].play());
   }
@@ -60,6 +48,7 @@ class _PlayerState extends State<PlayerWidget> {
   final ValueNotifier<String> _titleNotifier = ValueNotifier("");
   final ValueNotifier<String> _authorNotifier = ValueNotifier("");
   Duration _duration = const Duration(seconds: 0);
+  bool _isPaused = false;
 
   void _seek(Duration duration, bool startFromCurrentPosition) {
     if(!startFromCurrentPosition) {
@@ -84,13 +73,9 @@ class _PlayerState extends State<PlayerWidget> {
   }
 
   void play(Audio asset) {
-    //player.stop();
-    //player.dispose();
-
     try {
       _titleNotifier.value = asset.title;
       _authorNotifier.value = asset.author;
-      //player.play(DeviceFileSource(asset.source));
       player.setFilePath(asset.source).then((duration) {
         if(duration != null) {
           setState(() {
@@ -241,8 +226,10 @@ class _PlayerState extends State<PlayerWidget> {
                     _playingNotifier.value = !_playingNotifier.value;
                     if(_playingNotifier.value) {
                       player.play();
+                      _isPaused = false;
                     } else {
                       player.pause();
+                      _isPaused = true;
                     }
                   },
                 );
