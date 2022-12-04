@@ -66,6 +66,15 @@ class _PlayerState extends State<PlayerWidget> {
     return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
   }
 
+  void playStation(int index) {
+    setState(() {
+      player.stop();
+      selectedStation = index;
+      Preferences.instance.setCurrentStation(index);
+      play(stationsInstanced[index].play());
+    });
+  }
+
   void play(Audio asset) {
     player.stop();
     player.dispose();
@@ -173,12 +182,7 @@ class _PlayerState extends State<PlayerWidget> {
                 hoverColor: Colors.transparent,
                 icon: const Icon(Icons.skip_previous, size: 18.0),
                 onPressed: () {
-                  setState(() {
-                    player.stop();
-                    selectedStation = selectedStation - 1 <= 0 ? stationsInstanced.length - 1 : selectedStation - 1;
-                    Preferences.instance.setCurrentStation(selectedStation);
-                    play(stationsInstanced[selectedStation].play());
-                  });
+                  playStation(selectedStation - 1 <= 0 ? stationsInstanced.length - 1 : selectedStation - 1);
                 },
               ),
               IconButton(
@@ -225,12 +229,7 @@ class _PlayerState extends State<PlayerWidget> {
                 hoverColor: Colors.transparent,
                 icon: const Icon(Icons.skip_next, size: 18.0),
                 onPressed: () {
-                  setState(() {
-                    player.stop();
-                    selectedStation = selectedStation + 1 >= stationsInstanced.length - 1 ? 0 : selectedStation + 1;
-                    Preferences.instance.setCurrentStation(selectedStation);
-                    play(stationsInstanced[selectedStation].play());
-                  });
+                  playStation(selectedStation + 1 >= stationsInstanced.length - 1 ? 0 : selectedStation + 1);
                 },
               )
             ],
