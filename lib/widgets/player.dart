@@ -186,23 +186,6 @@ class _PlayerState extends State<PlayerWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              //TODO if want full vertical button
-              /*ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    selectedStation = selectedStation - 1 <= 0 ? stationsInstanced.length - 1 : selectedStation - 1;
-                  });
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: const <Widget>[
-                    /*Icon(Icons.developer_board),
-                    SizedBox(height: 10),
-                    Text("Experiences"),*/
-                    const Icon(Icons.arrow_left, size: 18.0),
-                  ],
-                ),
-              ),*/
               IconButton(
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
@@ -284,7 +267,10 @@ class StationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Expanded(child: Image.file(File(station.icon), fit: BoxFit.contain),),
-      Text(station.name),
+      FittedBox(
+          fit: BoxFit.fitWidth,
+          child: Text(station.name, style : const TextStyle(fontFamily: 'Pricedown', color: Colors.white),),
+      ),
     ]);
   }
 }
