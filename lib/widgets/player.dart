@@ -212,9 +212,12 @@ class _PlayerState extends State<PlayerWidget> {
                 hoverColor: Colors.transparent,
                 icon: const Icon(Icons.fast_rewind, size: 18.0, color: Colors.white,),
                 onPressed: () {
-                  setState(() {
-                    play(stationsInstanced[selectedStation].prev());
-                  });
+                  //If un split, seek 30 seconds behind
+                  if(stationsInstanced[selectedStation].runtimeType == StationUnsplit) {
+                    _seek(const Duration(seconds: 30), true);
+                    return;
+                  }
+                  play(stationsInstanced[selectedStation].prev());
                 },
               ),
               ValueListenableBuilder(valueListenable: _playingNotifier, builder: (BuildContext context, bool value, Widget? child) {
@@ -241,9 +244,12 @@ class _PlayerState extends State<PlayerWidget> {
                 hoverColor: Colors.transparent,
                 icon: const Icon(Icons.fast_forward, size: 18.0, color: Colors.white,),
                 onPressed: () {
-                  setState(() {
-                    play(stationsInstanced[selectedStation].next());
-                  });
+                  //If un split, seek 30 seconds ahead
+                  if(stationsInstanced[selectedStation].runtimeType == StationUnsplit) {
+                    _seek(const Duration(seconds: 30), true);
+                    return;
+                  }
+                  play(stationsInstanced[selectedStation].next());
                 },
               ),
               IconButton(
