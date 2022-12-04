@@ -59,7 +59,14 @@ class _PlayerState extends State<PlayerWidget> {
     player.seek(duration + player.position);
   }
 
-  String formatTime(int seconds) {
+  String formatTime(int seconds, {int? maxTime}) {
+    if(maxTime != null){
+      if (maxTime < 3600 && maxTime >= 60) {  //Less than an hour & more than a minute
+        return '${(Duration(seconds: seconds))}'.split('.')[0].substring(2, 7);
+      } else {
+        return '${(Duration(seconds: seconds))}'.split('.')[0].substring(5, 7);
+      }
+    }
     return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
   }
 
@@ -173,7 +180,7 @@ class _PlayerState extends State<PlayerWidget> {
           Row(
             children: [
               ValueListenableBuilder(valueListenable: _positionNotifier, builder: (BuildContext context, Duration value, Widget? child) {
-                return Text(formatTime(value.inSeconds), style: const TextStyle(fontFamily: 'FourteenSegment', color: Colors.white, fontFeatures: [
+                return Text(formatTime(value.inSeconds, maxTime: _duration.inSeconds), style: const TextStyle(fontFamily: 'FourteenSegment', color: Colors.white, fontFeatures: [
                   FontFeature.tabularFigures()
                 ],));
               }),
@@ -201,7 +208,7 @@ class _PlayerState extends State<PlayerWidget> {
                   );
                 }),
               ),
-              Text(formatTime(_duration.inSeconds), style: const TextStyle(fontFamily: 'FourteenSegment', color: Colors.white, fontFeatures: [
+              Text(formatTime(_duration.inSeconds, maxTime: _duration.inSeconds), style: const TextStyle(fontFamily: 'FourteenSegment', color: Colors.white, fontFeatures: [
                 FontFeature.tabularFigures()
               ],))
             ],
