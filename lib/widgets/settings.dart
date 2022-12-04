@@ -23,6 +23,7 @@ class _SettingsState extends State<SettingsWidget> {
 
   @override
   void initState() {
+    super.initState();
     adsPath = Preferences.instance.AdsPath;
     newsPath = Preferences.instance.NewsPath;
     weatherPath = Preferences.instance.WeatherPath;
