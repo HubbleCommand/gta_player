@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gta_player/util/preferences.dart';
 import 'package:gta_player/util/station_abstract.dart';
 import 'package:gta_player/widgets/settings.dart';
+import 'package:gta_player/widgets/stations_list.dart';
 
 class PlayerWidget extends StatefulWidget {
   const PlayerWidget({super.key});
@@ -108,7 +109,33 @@ class _PlayerState extends State<PlayerWidget> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Spacer(),
+              IconButton(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                hoverColor: Colors.transparent,
+                icon: const Icon(Icons.view_list, size: 18.0, color: Colors.white,),
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => StationsListWidget(stations: stationsInstanced,)),
+                  );
+
+                  if (!mounted || result == null) return;
+
+                  if(result.runtimeType == int) {
+                    if(result > 0 && result < stationsInstanced.length - 1) {
+                      playStation(result);
+                      return;
+                    }
+                  }
+
+                  //If the selected station couldn't be found
+                  ScaffoldMessenger.of(context)
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(const SnackBar(content: Text("Couldn't find the selected station")));
+                }
+              ),
+              const Spacer(),
               IconButton(
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
