@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:gta_player/util/preferences.dart';
 import 'package:gta_player/util/station_abstract.dart';
@@ -25,23 +25,32 @@ class _PlayerState extends State<PlayerWidget> {
     stationsInstanced = Preferences.instance.getStations();
     selectedStation = Preferences.instance.Station ?? selectedStation;
 
-    player.onPlayerComplete.listen((event) {
+    player.playingStream.listen((event) {
       //Play next
       debugPrint("Player completed...");
-      play(stationsInstanced[selectedStation].play());
+      //play(stationsInstanced[selectedStation].play());
     });
-    player.onPlayerStateChanged.listen((event) {
+    player.playerStateStream.listen((event) {
       debugPrint(event.toString());
-      _playingNotifier.value = event == PlayerState.playing;
+      _playingNotifier.value = event.playing;
+
+      /*if(!event.playing && event.processingState == ProcessingState.completed && !isPaused) {
+        debugPrint("Event was not playing, and was also not paused... so play next!");
+        play(stationsInstanced[selectedStation].play());
+      }*/
+      if(event.processingState == ProcessingState.completed) {
+        debugPrint("Event was not playing, and was also not paused... so play next!");
+        play(stationsInstanced[selectedStation].play());
+      }
     });
-    player.onPositionChanged.listen((event) {
+    player.positionStream.listen((event) {
       _positionNotifier.value = event;
     });
-    player.onDurationChanged.listen((event) {
+    /*player.onDurationChanged.listen((event) {
       setState(() {
         _duration = event;
       });
-    });
+    });*/
 
     play(stationsInstanced[selectedStation].play());
   }
@@ -58,9 +67,7 @@ class _PlayerState extends State<PlayerWidget> {
       return;
     }
 
-    player.getCurrentPosition().then((value) => {
-      player.seek(duration + value!)
-    });
+    player.seek(duration + player.position);
   }
 
   String formatTime(int seconds) {
@@ -77,13 +84,20 @@ class _PlayerState extends State<PlayerWidget> {
   }
 
   void play(Audio asset) {
-    player.stop();
-    player.dispose();
+    //player.stop();
+    //player.dispose();
 
     try {
       _titleNotifier.value = asset.title;
       _authorNotifier.value = asset.author;
-      player.play(DeviceFileSource(asset.source));
+      //player.play(DeviceFileSource(asset.source));
+      player.setFilePath(asset.source).then((duration) {
+        if(duration != null) {
+          setState(() {
+            _duration = duration;
+          });
+        }
+      });
 
       if(asset.seekAmount != null) {
         _seek(asset.seekAmount! + _positionNotifier.value, true);
@@ -96,6 +110,12 @@ class _PlayerState extends State<PlayerWidget> {
       _authorNotifier.value = "";
       player.stop();
       player.dispose();
+
+      _playingNotifier.value = false;
+      _positionNotifier.value = const Duration(seconds: 0);
+      _titleNotifier.value = "";
+      _authorNotifier.value = "";
+      _duration = const Duration(seconds: 0);
     }
   }
 
@@ -170,10 +190,15 @@ class _PlayerState extends State<PlayerWidget> {
               }),
               Expanded(
                 child: ValueListenableBuilder(valueListenable: _positionNotifier, builder: (BuildContext context, Duration value, Widget? child) {
+                  double val = 0;
+                  if(value.inMilliseconds.toDouble() >= 0 && value.inMilliseconds.toDouble() <= _duration.inMilliseconds.toDouble()) {
+                    val = value.inMilliseconds.toDouble();
+                  }
                   return Slider(
+
                     min: 0,
                     max: _duration.inMilliseconds.toDouble(),
-                    value: value.inMilliseconds.toDouble(),
+                    value: val,
                     onChanged: (changedValue) {
                       _seek(Duration(milliseconds: changedValue.toInt()), false);
                     },
@@ -215,7 +240,7 @@ class _PlayerState extends State<PlayerWidget> {
                   onPressed: () {
                     _playingNotifier.value = !_playingNotifier.value;
                     if(_playingNotifier.value) {
-                      player.resume();
+                      player.play();
                     } else {
                       player.pause();
                     }
