@@ -39,10 +39,10 @@ flutter:
         - asset: assets/fonts/pricedown/pricedown bl.otf
     - family: SevenSegment
       fonts:
-        - asset: assets/fonts/seven_segment/Seven Segment.ttf
+        - asset: assets/fonts/DSEG7Modern-Light.ttf
     - family: FourteenSegment
       fonts:
-          - asset: assets/fonts/Fourteen Segment.ttf
+        - asset: assets/fonts/DSEG14Modern-Light.ttf
 
   # With full list of assets, takes about 7 - 12 minutes to build
   # For this to all make better sense, also including icons in each station's folder
