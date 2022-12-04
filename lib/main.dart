@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gta_player/widgets/loading.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -11,6 +12,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+
     Permission.storage.status.then((value) {
       if (value != PermissionStatus.granted) {
         Permission.storage.request().then((value){
