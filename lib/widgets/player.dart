@@ -63,11 +63,19 @@ class _PlayerState extends State<PlayerWidget> {
     if(maxTime != null){
       if (maxTime < 3600 && maxTime >= 60) {  //Less than an hour & more than a minute
         return '${(Duration(seconds: seconds))}'.split('.')[0].substring(2, 7).padLeft(4, '0');
-      } else {
+      } else if (maxTime < 60){
         return '${(Duration(seconds: seconds))}'.split('.')[0].substring(5, 7).padLeft(2, '0');
       }
     }
     return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
+  }
+
+  void nextStation() {
+    playStation(selectedStation + 1 >= stationsInstanced.length - 1 ? 0 : selectedStation + 1);
+  }
+
+  void previousStation() {
+    playStation(selectedStation - 1 <= 0 ? stationsInstanced.length - 1 : selectedStation - 1);
   }
 
   void playStation(int index) {
@@ -160,7 +168,16 @@ class _PlayerState extends State<PlayerWidget> {
               )
             ],
           ),
-          Expanded(child: StationCard(station: stationsInstanced[selectedStation])),
+          Expanded(child: GestureDetector(
+            onPanEnd: (details) {
+              if(details.velocity.pixelsPerSecond.direction > 0) {  //Swiping right
+                nextStation();
+              } else {  //Swiping left
+                previousStation();
+              }
+            },
+            child: StationCard(station: stationsInstanced[selectedStation]),
+          ),),
           ValueListenableBuilder(valueListenable: _titleNotifier, builder: (BuildContext context, String value, Widget? child) {
             return Visibility(
               visible: value.isNotEmpty,
@@ -214,7 +231,8 @@ class _PlayerState extends State<PlayerWidget> {
                 hoverColor: Colors.transparent,
                 icon: const Icon(Icons.skip_previous, size: 18.0, color: Colors.white,),
                 onPressed: () {
-                  playStation(selectedStation - 1 <= 0 ? stationsInstanced.length - 1 : selectedStation - 1);
+                  //playStation(selectedStation - 1 <= 0 ? stationsInstanced.length - 1 : selectedStation - 1);
+                  previousStation();
                 },
               ),
               IconButton(
@@ -267,7 +285,8 @@ class _PlayerState extends State<PlayerWidget> {
                 hoverColor: Colors.transparent,
                 icon: const Icon(Icons.skip_next, size: 18.0, color: Colors.white,),
                 onPressed: () {
-                  playStation(selectedStation + 1 >= stationsInstanced.length - 1 ? 0 : selectedStation + 1);
+                  //playStation(selectedStation + 1 >= stationsInstanced.length - 1 ? 0 : selectedStation + 1);
+                  nextStation();
                 },
               )
             ],
